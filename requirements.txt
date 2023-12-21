@@ -1,0 +1,9 @@
+requests==2.31.0
+xmltodict==0.13.0
+pandas==2.0.3
+openai==0.27.8
+python-dotenv==1.0.0
+editdistance==0.6.2
+# For evaluation
+prettytable==3.8.0
+torch==2.0.1
