@@ -24,3 +24,50 @@ This GitHub repository hosts the code and data resources accompanying the paper 
 6. To fine-tune a LLaMA model with LoRA and our data, follow the instructions in spice_finetuning.ipynb
 7. Create predictions with the spice_predictions.ipynb script
 8. The automatic evaluation can be executed using the spice_evaluation.ipynb script
+
+## Prompts
+The applied prompts are defined in the file [Prompts.py](https://github.com/sebischair/LLM-SP-CQA/blob/main/Prompts.py).
+#### Zero-Shot
+Generate a SPARQL query that answers the given ’Input question:’. Use ’Entities:’, ’Relations:’ and ’Types:’ specified in the prompt to generate the query. The SPARQL query should be compatible with the Wikidata knowledge graph. Prefixes like ’wdt’ and ’wd’ have already been defined. No language tag is required. Use ’?x’ as variable name in the SPARQL query. Remember to provide only a SPARQL query in the response without any notes, comments, or explanations.
+
+<*conversation_history*>
+Input question: <*utterance*>
+Entities: <*entities*>
+Relations: <*relations*>
+Types: <*types*>
+
+#### Few-Shot
+Generate a SPARQL query that answers the given ’Input question:’. Use ’Entities:’, ’Relations:’ and ’Types:’ specified in the prompt to generate the query. The SPARQL query should be compatible with the Wikidata knowledge graph. Prefixes like ’wdt’ and ’wd’ have already been defined. No language tag is required. Use ’?x’ as variable name in the SPARQL query. Remember to provide only a SPARQL query in the response without any notes, comments, or explanations.
+
+Input question: Is New York City the place of death of Cirilo Villaverde ?
+Entities: {’Q727043’: ’Cirilo Villaverde’, ’Q60’: ’New York City’}
+Relations: {’P20’: ’place of death’}
+Types: {’Q56061’: ’administrative territorial entity’}
+
+SPARQL query: ASK { wd:Q727043 wdt:P20 wd:Q60 . }
+
+Input question: How many works of art express Michael Jordan or pain ?
+Entities: {’Q41421’: ’Michael Jordan’, ’Q81938’: ’pain’}
+Relations: {’P180’: ’depicts’}
+Types: {’Q838948’: ’work of art’}
+
+SPARQL query: SELECT (COUNT(DISTINCT ?x) AS ?count) WHERE { { ?x
+wdt:P180 wd:Q41421 . ?x wdt:P31 wd:Q838948 . } UNION { ?x wdt:P180
+wd:Q81938 . ?x wdt:P31 wd:Q838948 . } }
+
+Conversation history:
+USER: Which administrative territory is the native country of Cirilo Villaverde ?
+SYSTEM: {’Q241’: ’Cuba’}
+Input question: Which is the national anthem of that administrative territory ?
+Entities: {’Q241’: ’Cuba’}
+Relations: {’P85’: ’anthem’}
+Types: {’Q484692’: ’hymn’}
+
+SPARQL query: SELECT ?x WHERE { wd:Q241 wdt:P85 ?x . ?x wdt:P31
+wd:Q484692 . }
+
+<*conversation_history*>
+Input question: <*utterance*>
+Entities: <*entities*>
+Relations: <*relations*>
+Types: <*types*>
