@@ -2,18 +2,29 @@
 
 This GitHub repository hosts the code and data resources accompanying the paper titled "Evaluating Large Language Models in Semantic Parsing for Conversational Question Answering over Knowledge Graphs".
 
+---
+
+## Citation
+> Schneider, P., Klettner, M., Jokinen, K., Simperl, E., & Matthes, F. (2024). [Evaluating Large Language Models in Semantic Parsing for Conversational Question Answering over Knowledge Graphs](https://www.scitepress.org/Papers/2024/123943/123943.pdf). In Proceedings of the 16th International Conference on Agents and Artificial Intelligence (ICAART). SCITEPRESS-Science and Technology Publications.
+
+**If you use our models and dataset in your research, please cite the above paper.**
+
+---
+
 ## Structure of the Repository
-* **spice_dataset_preparation.ipynb**: Was have created a processed dataset called SPICE_dataset_pp. This is a processed version of the original SPICE dataset that resolves Wikidata references and adds them explicitly to speed up inference e.g. _{'Q1238570': 'political scientist'}_ instead of only _'Q1238570'_
+* `spice_dataset_preparation.ipynb`: Was have created a processed dataset called SPICE_dataset_pp. This is a processed version of the original SPICE dataset that resolves Wikidata references and adds them explicitly to speed up inference e.g. _{'Q1238570': 'political scientist'}_ instead of only _'Q1238570'_
     * You only need to use this if you want to reproduce the processed dataset or if you increase the size of the subset from the test set for the predictions
-* **spice_finetune_dataset.ipynb**: This was utilized to create the fine-tuning dataset. It results in spice_finetune_dataset_chat_30000_v02.json which we use to create the LoRA-7B model based on LLaMA
+* `spice_finetune_dataset.ipynb`: This was utilized to create the fine-tuning dataset. It results in spice_finetune_dataset_chat_30000_v02.json which we use to create the LoRA-7B model based on LLaMA
     * This is only needed if you want to change the size of the existing fine-tuning dataset
-* **spice_finetuning.ipynb**: Contains the code to fine-tune the LLaMA model using spice_finetune_dataset_chat_30000_v02.json as data and the LoRA approach
-* **spice_predictions.ipynb**: This is the code to create SPARQL query predictions with models running on a local server (i.e. LLaMA, Vicuna, LoRA) and from the OpenAI API (i.e. GPT-3.5-Turbo). It selects the number of samples for each question sub-category according to the distribution of the full test set.
-* **spice_evaluation.ipynb**: It first merges all predictions of one model-prompt combination into a dedicated file. Afterwards it is used to execute the official evaluation script for each question type.
-* **human_evaluation/human_evaluation_script.ipynb**: This was used to select random instances for labeling and to analyze the annotated data.
-* **lora_adapter**: Adapter for LLaMA to create the LoRA model fine-tuned on SPICE
-* **Results**: Contains predictions and evaluations for all model prompt combinations
-* **SPICE_dataset_pp**: A processed version of the SPICE dataset that contains resolved references to entities
+* `spice_finetuning.ipynb`: Contains the code to fine-tune the LLaMA model using spice_finetune_dataset_chat_30000_v02.json as data and the LoRA approach
+* `spice_predictions.ipynb`: This is the code to create SPARQL query predictions with models running on a local server (i.e. LLaMA, Vicuna, LoRA) and from the OpenAI API (i.e. GPT-3.5-Turbo). It selects the number of samples for each question sub-category according to the distribution of the full test set.
+* `spice_evaluation.ipynb`: It first merges all predictions of one model-prompt combination into a dedicated file. Afterwards it is used to execute the official evaluation script for each question type.
+* `human_evaluation/human_evaluation_script.ipynb`: This was used to select random instances for labeling and to analyze the annotated data.
+* `lora_adapter/`: Adapter for LLaMA to create the LoRA model fine-tuned on SPICE
+* `Results/`: Contains predictions and evaluations for all model prompt combinations
+* `SPICE_dataset_pp/`: A processed version of the SPICE dataset that contains resolved references to entities
+
+---
 
 ## Setup
 1. Download the SPICE data set (available [here](https://github.com/EdinburghNLP/SPICE/tree/main))
@@ -25,18 +36,22 @@ This GitHub repository hosts the code and data resources accompanying the paper 
 7. Create predictions with the spice_predictions.ipynb script
 8. The automatic evaluation can be executed using the spice_evaluation.ipynb script
 
+---
+
 ## Prompts
-The applied prompts are defined in the file [Prompts.py](https://github.com/sebischair/LLM-SP-CQA/blob/main/Prompts.py).
+The applied prompts are defined in the file [Prompts.py](https://github.com/sebischair/LLM-SP-CQA/blob/main/Prompts.py). Values enclosed in angle brackets (e.g., <*utterance*>, <*entities*>, etc.) represents a dynamically inserted variable.
 #### Zero-Shot
+```
 Generate a SPARQL query that answers the given ’Input question:’. Use ’Entities:’, ’Relations:’ and ’Types:’ specified in the prompt to generate the query. The SPARQL query should be compatible with the Wikidata knowledge graph. Prefixes like ’wdt’ and ’wd’ have already been defined. No language tag is required. Use ’?x’ as variable name in the SPARQL query. Remember to provide only a SPARQL query in the response without any notes, comments, or explanations.
 
-<*conversation_history*>
-Input question: <*utterance*>
-Entities: <*entities*>
-Relations: <*relations*>
-Types: <*types*>
-
+<conversation_history>
+Input question: <utterance>
+Entities: <entities>
+Relations: <relations>
+Types: <types>
+```
 #### Few-Shot
+```
 Generate a SPARQL query that answers the given ’Input question:’. Use ’Entities:’, ’Relations:’ and ’Types:’ specified in the prompt to generate the query. The SPARQL query should be compatible with the Wikidata knowledge graph. Prefixes like ’wdt’ and ’wd’ have already been defined. No language tag is required. Use ’?x’ as variable name in the SPARQL query. Remember to provide only a SPARQL query in the response without any notes, comments, or explanations.
 
 Input question: Is New York City the place of death of Cirilo Villaverde ?
@@ -66,8 +81,9 @@ Types: {’Q484692’: ’hymn’}
 SPARQL query: SELECT ?x WHERE { wd:Q241 wdt:P85 ?x . ?x wdt:P31
 wd:Q484692 . }
 
-<*conversation_history*>
-Input question: <*utterance*>
-Entities: <*entities*>
-Relations: <*relations*>
-Types: <*types*>
+<conversation_history>
+Input question: <utterance>
+Entities: <entities>
+Relations: <relations>
+Types: <types>
+```
